@@ -1,0 +1,76 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[top=20pt, left=40pt, right=60pt]{geometry}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\usepackage[utf8]{inputenc}
+\title{\textbf{REPORT - PROGRAMMING ASSIGNMENT 3}}
+\author{Siddharth Agrawal 150716\\K Karthikeyan 150311\\Shubham Kumar Bharti 150702}
+\date{April 1, 2017}
+
+\begin{document}
+
+\maketitle
+
+\section*{Question 1}
+
+\begin{tabular}{|L{5cm}|c|c|c|c|c|}
+
+\hline
+ & $n=10^2$ & $n=10^3$ & $n=10^4$ & $n=10^5$ & $n=10^6$\\
+\hline
+\hline
+ Average running time of QuickSort & $1.1705\times10^{-5}$ & $1.4301\times10^{-4}$ & $1.6566\times10^{-3}$ & $1.8674\times10^{-2}$ & $2.245 \times 10^{-1}$ \\
+\hline
+ Average running time of MergeSort & $1.824\times10^{-5}$ & $1.978\times10^{-4}$ & $1.2943\times10^{-3}$ & $2.774\times10^{-2}$ & $3.2257\times10^{-1}$ \\
+\hline
+ Average number of comparisons in QuickSort & $677.698$ & $11031.96$ & $176492$ & $2142963$ & $26946279$ \\
+\hline
+ Average number of comparisons in MergeSort & $529.824$ & $8767.04$ & $120641$ & $1556366$ & $18674266$ \\
+\hline
+ No. of times MergeSort had lesser no. of comparisons than QuickSort & $996$ & $1000$ & $1000$ & $1000$ & $1000$\\
+\hline
+ 
+\end{tabular}
+\\
+\\
+\begin{itemize}
+  \item Although Quick sort worst time complexity is $ n^2$ in practice it is better than Merge sort whose worst time complexity is $n \log(n) $.
+  \item Average number of comparisons in Quick sort is approx. 1.4 times Average number of comparisons in Merge sort.(Theoretically it can be proved average number of comparisons in Quick sort is $ 1.39 \times n \log(n)$)
+  \item Average number of comparisons in Merge sort is approx. $n \log(n) $ 
+  \item Although number of comparisons in Quick sort is more than in Merge sort (about 1.4 times) time taken is less which tells that constant in Quick sort is smaller than constant in Merge sort.
+\end{itemize}
+
+\begin{tabular}{|L{5cm}|c|c|c|c|c|}
+
+\hline
+ & $n=10^2$ & $n=10^3$ & $n=10^4$ & $n=10^5$ & $n=10^6$\\
+\hline
+\hline
+Average running time of QuickSort & $1.1705\times10^{-5}$ & $1.4301\times10^{-4}$ & $1.6566\times10^{-3}$ & $1.8674\times10^{-2}$ & $2.245 \times 10^{-1}$ \\
+\hline
+ Average running time of MergeSort & $1.824\times10^{-5}$ & $1.978\times10^{-4}$ & $1.2943\times10^{-3}$ & $2.774\times10^{-2}$ & $3.2257\times10^{-1}$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 5\% & $19.8\%$& $24.4\%$ & $13.2\%$ & $16.9\%$ & $14.1\%$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 10\% & $9.7\%$& $13.2\%$ & $8.3\%$ & $7.8\%$ & $6.3\%$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 20\% & $6.0\%$& $7.8\%$ & $4.5\%$ & $ 3.4\%$ & $2.3\%$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 30\% & $4.1\%$& $1.8\%$ & $2.3\%$ & $1.5\%$ & $0.1\%$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 40\% & $3.6\%$& $0.9\%$ & $2.8\%$ & $0.6\%$ & $0\%$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 50\% & $2.7\%$& $0.5\%$ & $1.8\%$ & $0.4\%$ & $0\%$ \\
+\hline
+Percentage of cases when running time of QuickSort exceeds average by 100\% & $1.2\%$& $0\%$ & $0\%$ & $0.1\%$ & $0\%$ \\
+\hline
+
+\end{tabular}
+\begin{itemize}
+  \item Only about 20 \% of cases exceeds average time by  5\%  in Quick sort, so the remaining 80\% of the cases are very much closer to the average time, hence most of the cases follow about $ n \log(n)$ complexity
+  \item Percentage of cases which exceeds average by 20\% decreases to about 5\%. so very few cases are far from average.
+  \item Almost all except 0.1\% lies within $2\times average $ i.e. within $ 2\times n \log(n)$
+  \item As n increases percentage of cases away from average decreases.
+\end{itemize}
+
+\end{document}
