@@ -19,7 +19,6 @@
 #include "switch.h"
 #include "synch.h"
 #include "system.h"
-
 #define STACK_FENCEPOST 0xdeadbeef	// this is put at the top of the
 					// execution stack, for detecting 
 					// stack overflows
@@ -32,18 +31,41 @@
 //	"threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
+static int globalThreadCounter = 0;
 NachOSThread::NachOSThread(char* threadName)
 {
+    wakeUpParent = 0;
+    allChildren = new List();
+    exitedChildren = new List();
+    pid = ++globalThreadCounter;
     name = threadName;
     stackTop = NULL;
     stack = NULL;
+    numInstr = 0;
     status = JUST_CREATED;
+
+    if(globalThreadCounter == 1){
+        ppid = 0;
+        parent = NULL;
+    }
+    else{
+        ppid = getPID();
+        parent = currentThread;
+    }
+
 #ifdef USER_PROGRAM
     space = NULL;
     stateRestored = true;
 #endif
 }
 
+int NachOSThread::getPID(){
+    return pid;
+}
+
+int NachOSThread::getPPID(){
+    return ppid;
+}
 //----------------------------------------------------------------------
 // NachOSThread::~NachOSThread
 // 	De-allocate a thread.
@@ -97,7 +119,18 @@ NachOSThread::ThreadFork(VoidFunctionPtr func, int arg)
     scheduler->MoveThreadToReadyQueue(this);	// MoveThreadToReadyQueue assumes that interrupts 
 					// are disabled!
     (void) interrupt->SetLevel(oldLevel);
-}    
+}
+
+void
+NachOSThread::ThreadJoin(int childPID){
+    if(exitedChildren->Find(childPID)){} //do nothing just return
+    else{
+        NachOSThread* child = (NachOSThread*) allChildren->Search(childPID); //Get a pointer to alive child
+        child->wakeUpParent = 1;    // make that child wake up parent when it finishes
+        currentThread->PutThreadToSleep();
+    }
+}
+
 
 //----------------------------------------------------------------------
 // NachOSThread::CheckOverflow
@@ -147,9 +180,15 @@ NachOSThread::FinishThread ()
     (void) interrupt->SetLevel(IntOff);		
     ASSERT(this == currentThread);
     
+    if(parent == NULL) interrupt->Halt() ;    
+    if(wakeUpParent == 1){
+        // put the parent thread in ready list.
+        scheduler->MoveThreadToReadyQueue(parent);
+    }
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
     
     threadToBeDestroyed = currentThread;
+    parent->exitedChildren->Append(new ListElement(NULL, getPID()));
     PutThreadToSleep();					// invokes SWITCH
     // not reached
 }

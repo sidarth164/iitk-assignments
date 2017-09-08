@@ -28,6 +28,7 @@ extern ProcessScheduler *scheduler;			// the thread scheduler
 extern Interrupt *interrupt;			// interrupt status
 extern Statistics *stats;			// performance metrics
 extern Timer *timer;				// the hardware alarm clock
+extern List *sleeping_threads;		// List of sleeping threads
 
 extern bool initializedConsoleSemaphores;       // Used to initialize the semaphores for console I/O exactly once
 

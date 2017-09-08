@@ -1,12 +1,6 @@
-// system.cc 
-//	Nachos initialization and cleanup routines.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
-
 #include "copyright.h"
 #include "system.h"
+#include "list.h"
 
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -18,6 +12,8 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
+
+List *sleeping_threads;	//List of all the threads which are currently sleeping
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -63,6 +59,25 @@ TimerInterruptHandler(int dummy)
 {
     if (interrupt->getStatus() != IdleMode)
 	interrupt->YieldOnReturn();
+    
+    int wakeTime;
+    NachOSThread* thread_in_focus;
+
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+    //Check the list of sleeping threads if anyone has to be awoken!!
+    while(!(sleeping_threads->IsEmpty())){
+        thread_in_focus =(NachOSThread*)sleeping_threads->SortedRemove(&wakeTime);
+        if(wakeTime <= stats->totalTicks){
+            scheduler->MoveThreadToReadyQueue(thread_in_focus);
+        }
+        else{
+            sleeping_threads->SortedInsert(thread_in_focus,wakeTime);
+        }
+    }
+
+    (void) interrupt->SetLevel(oldLevel);
+
 }
 
 //----------------------------------------------------------------------
@@ -136,6 +151,7 @@ Initialize(int argc, char **argv)
     stats = new Statistics();			// collect statistics
     interrupt = new Interrupt;			// start up interrupt handling
     scheduler = new ProcessScheduler();		// initialize the ready queue
+    sleeping_threads = new List();		// initialize the sleeping thread queue
     //if (randomYield)				// start the timer (if needed)
 	timer = new Timer(TimerInterruptHandler, 0, randomYield);
 
@@ -197,4 +213,5 @@ Cleanup()
     
     Exit(0);
 }
+
 

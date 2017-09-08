@@ -57,8 +57,7 @@ List::List()
 
 List::~List()
 { 
-    while (Remove() != NULL)
-	;	 // delete all the list elements
+    while (Remove() != NULL);	 // delete all the list elements
 }
 
 //----------------------------------------------------------------------
@@ -72,6 +71,28 @@ List::~List()
 //	"item" is the thing to put on the list, it can be a pointer to 
 //		anything.
 //----------------------------------------------------------------------
+
+bool
+List::Find(int pid){
+    ListElement* temp = this->first;
+    while(temp!=NULL && temp->key != pid){
+        temp = temp->next;
+    }
+
+    if(temp->key == pid) return true;
+    return false;
+}
+
+void* List::Search(int pid){
+    ListElement* temp = this->first;
+    while(temp!=NULL && temp->key != pid){
+        temp = temp->next;
+                        }
+            
+    if(temp->key == pid) return (void*) temp->item;
+    return NULL;
+
+}
 
 void
 List::Append(void *item)

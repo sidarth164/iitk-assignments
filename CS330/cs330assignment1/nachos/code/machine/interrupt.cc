@@ -159,6 +159,7 @@ Interrupt::OneTick()
     } else {					// USER_PROGRAM
 	stats->totalTicks += UserTick;
 	stats->userTicks += UserTick;
+    currentThread->numInstr+=1;
     }
     DEBUG('i', "\n== Tick %d ==\n", stats->totalTicks);
 

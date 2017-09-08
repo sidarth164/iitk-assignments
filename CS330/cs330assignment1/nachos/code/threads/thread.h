@@ -33,13 +33,12 @@
 // Copyright (c) 1992-1993 The Regents of the University of California.
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
-
+#include "list.h"
 #ifndef THREAD_H
 #define THREAD_H
 
 #include "copyright.h"
 #include "utility.h"
-
 #ifdef USER_PROGRAM
 #include "machine.h"
 #include "addrspace.h"
@@ -88,7 +87,7 @@ class NachOSThread {
 					// is called
 
     // basic thread operations
-
+    void ThreadJoin(int childPID);
     void ThreadFork(VoidFunctionPtr func, int arg); 	// Make thread run (*func)(arg)
     void YieldCPU();  				// Relinquish the CPU if any 
 						// other thread is runnable
@@ -98,6 +97,9 @@ class NachOSThread {
     
     void CheckOverflow();   			// Check if thread has 
 						// overflowed its stack
+    int getPID();
+    int getPPID();
+    int numInstr;
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
@@ -110,11 +112,13 @@ class NachOSThread {
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
-
+    NachOSThread* parent;
     void CreateThreadStack(VoidFunctionPtr func, int arg);
     					// Allocate a stack for thread.
 					// Used internally by ThreadFork()
-
+    List* allChildren;
+    List* exitedChildren;
+    int wakeUpParent;
     int pid, ppid;			// My pid and my parent's pid
 
 #ifdef USER_PROGRAM

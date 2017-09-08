@@ -26,6 +26,7 @@
 #include "syscall.h"
 #include "console.h"
 #include "synch.h"
+#include "stats.h"
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -140,6 +141,89 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
+    else if ((which == SyscallException) && (type == SysCall_GetReg)) {
+       int reg_no = machine->ReadRegister(4);
+       int data = machine->ReadRegister(reg_no);
+       machine->WriteRegister(2,data);
+        // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+       
+    }
+    else if((which == SyscallException) && (type == SysCall_GetPA)){
+       unsigned int virtual_address = machine -> ReadRegister(4);
+       unsigned int virtual_page_no = virtual_address/( PageSize);
+       if(virtual_page_no > (machine-> pageTableSize))
+          machine->WriteRegister(2,-1);
+       else if(!(((machine->KernelPageTable)[virtual_page_no]).valid))
+          machine->WriteRegister(2,-1);
+       else if( (((machine->KernelPageTable)[virtual_page_no]).physicalPage)> NumPhysPages)
+          machine->WriteRegister(2,-1);
+       else
+          machine->WriteRegister(2,(((machine->KernelPageTable)[virtual_page_no]).physicalPage)*(PageSize) + virtual_address%(PageSize) );
+       
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+ 
+    }
+    else if((which == SyscallException) && (type == SysCall_GetPID)){
+       machine->WriteRegister(2,currentThread->getPID());
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if((which == SyscallException) && (type == SysCall_GetPPID)){
+       machine->WriteRegister(2,currentThread->getPPID());
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if((which == SyscallException) && (type == SysCall_NumInstr)){
+        machine->WriteRegister(2,currentThread->numInstr);
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if((which == SyscallException) && (type == SysCall_Yield)){
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+       currentThread->YieldCPU();
+    }
+    else if((which == SyscallException) && (type == SysCall_Time)){
+       machine->WriteRegister(2,stats->totalTicks);
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if((which == SyscallException) && (type == SysCall_Sleep)){
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+
+       unsigned int sleep_time = machine->ReadRegister(4);
+
+       if(sleep_time == 0){
+          currentThread->YieldCPU();
+       }
+       else{
+          IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+          sleeping_threads->SortedInsert(currentThread,stats->totalTicks+sleep_time);
+
+          currentThread->PutThreadToSleep();
+          (void) interrupt->SetLevel(oldLevel);
+       }
+    }
     else if ((which == SyscallException) && (type == SysCall_PrintIntHex)) {
        printvalus = (unsigned)machine->ReadRegister(4);
        writeDone->P() ;
@@ -157,7 +241,54 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-    } else {
+    }
+    else if ((which == SyscallException) && (type == SysCall_Exit)) {
+        currentThread->FinishThread();
+    }
+
+    else if ((which == SyscallException) && (type == SysCall_Join)) {
+        int pid = (int) machine->ReadRegister(4);
+        currentThread->ThreadJoin(pid);
+    }
+    else if((which == SyscallException) && (type == SysCall_Exec)){
+        vaddr = machine->ReadRegister(4);
+        char* filename=new char[1000];
+        int i=0;
+        machine->ReadMem(vaddr, 1, &memval);
+        while ((*(char*)&memval) != '\0') {
+            filename[i]=(*(char*)&memval);
+            i++;
+            vaddr++;
+            machine->ReadMem(vaddr, 1, &memval);
+        }
+        filename[i]=('\0');
+
+        OpenFile *executable = fileSystem->Open(filename);
+        ProcessAddressSpace *space;
+
+        if (executable == NULL) {
+            printf("Unable to open file %s\n", filename);
+            return;
+        }
+        space = new ProcessAddressSpace(executable);
+
+        if(currentThread->space!=NULL){
+            delete currentThread->space;
+        }
+
+        currentThread->space = space;
+
+        delete executable;     // close file
+
+        space->InitUserModeCPURegisters();   // set the initial register values
+        space->RestoreContextOnSwitch();   // load page table register
+
+        machine->Run();      // jump to the user progam
+                            // machine->Run never returns;
+                            // the address space exits
+                            // by doing the syscall "exit"       
+    }    
+    else {
 	printf("Unexpected user mode exception %d %d\n", which, type);
 	ASSERT(FALSE);
     }

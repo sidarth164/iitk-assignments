@@ -20,6 +20,9 @@
 #include "addrspace.h"
 #include "noff.h"
 
+// totalPagesCount stores the total number of pages present. Initialize it to  zero for the very first time.
+int totalPagesCount=0;
+
 //----------------------------------------------------------------------
 // SwapHeader
 // 	Do little endian to big endian conversion on the bytes in the 
@@ -75,7 +78,8 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
     numVirtualPages = divRoundUp(size, PageSize);
     size = numVirtualPages * PageSize;
 
-    ASSERT(numVirtualPages <= NumPhysPages);		// check we're not trying
+    //I am adding totalPagesCount to the physicalPage
+    ASSERT(numVirtualPages+totalPagesCount <= NumPhysPages);		// check we're not trying
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
@@ -86,7 +90,7 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
     KernelPageTable = new TranslationEntry[numVirtualPages];
     for (i = 0; i < numVirtualPages; i++) {
 	KernelPageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
-	KernelPageTable[i].physicalPage = i;
+	KernelPageTable[i].physicalPage = i+totalPagesCount;
 	KernelPageTable[i].valid = TRUE;
 	KernelPageTable[i].use = FALSE;
 	KernelPageTable[i].dirty = FALSE;
@@ -97,22 +101,27 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
     
 // zero out the entire address space, to zero the unitialized data segment 
 // and the stack segment
-    bzero(machine->mainMemory, size);
+    bzero((machine->mainMemory+totalPagesCount*PageSize), size);
 
 // then, copy in the code and data segments into memory
     if (noffH.code.size > 0) {
         DEBUG('a', "Initializing code segment, at 0x%x, size %d\n", 
 			noffH.code.virtualAddr, noffH.code.size);
-        executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
+        executable->ReadAt(&((machine->mainMemory+totalPagesCount*PageSize)[noffH.code.virtualAddr]),
 			noffH.code.size, noffH.code.inFileAddr);
     }
     if (noffH.initData.size > 0) {
         DEBUG('a', "Initializing data segment, at 0x%x, size %d\n", 
 			noffH.initData.virtualAddr, noffH.initData.size);
-        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]),
+        executable->ReadAt(&((machine->mainMemory+totalPagesCount*PageSize)[noffH.initData.virtualAddr]),
 			noffH.initData.size, noffH.initData.inFileAddr);
     }
 
+    // Increment the total number pages
+    totalPagesCount+=numVirtualPages;
+    
+    //printf("%d pages added\nNow total pages = %d\n",numVirtualPages,totalPagesCount);
+    DEBUG('a',"Total number of pages = %d\n",totalPagesCount);
 }
 
 //----------------------------------------------------------------------
