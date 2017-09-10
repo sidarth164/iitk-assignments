@@ -23,6 +23,7 @@ class ProcessAddressSpace {
     ProcessAddressSpace(OpenFile *executable);	// Create an address space,
 					// initializing it with the program
 					// stored in the file "executable"
+    ProcessAddressSpace();          // constructor to handle fork calls
     ~ProcessAddressSpace();			// De-allocate an address space
 
     void InitUserModeCPURegisters();		// Initialize user-level CPU registers,
@@ -30,6 +31,7 @@ class ProcessAddressSpace {
 
     void SaveContextOnSwitch();			// Save/restore address space-specific
     void RestoreContextOnSwitch();		// info on a context switch 
+    unsigned size;
 
   private:
     TranslationEntry *KernelPageTable;	// Assume linear page table translation

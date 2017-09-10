@@ -63,7 +63,7 @@ SwapHeader (NoffHeader *noffH)
 ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
 {
     NoffHeader noffH;
-    unsigned int i, size;
+    unsigned int i;
 
     executable->ReadAt((char *)&noffH, sizeof(noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) && 
@@ -122,6 +122,38 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
     
     //printf("%d pages added\nNow total pages = %d\n",numVirtualPages,totalPagesCount);
     DEBUG('a',"Total number of pages = %d\n",totalPagesCount);
+}
+
+// This constructor has been created to handle fork
+ProcessAddressSpace::ProcessAddressSpace(){
+    unsigned int i;
+    ProcessAddressSpace *copy = currentThread->space;
+    numVirtualPages = copy->size/PageSize;
+    size=copy->size;
+
+    ASSERT(numVirtualPages+totalPagesCount <= NumPhysPages);
+
+// first, set up the translation 
+    KernelPageTable = new TranslationEntry[numVirtualPages];
+    for (i = 0; i < numVirtualPages; i++) {
+	KernelPageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
+	KernelPageTable[i].physicalPage = i+totalPagesCount;
+	KernelPageTable[i].valid = TRUE;
+	KernelPageTable[i].use = FALSE;
+	KernelPageTable[i].dirty = FALSE;
+	KernelPageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
+					// a separate page, we could set its 
+					// pages to be read-only
+    }
+
+    totalPagesCount+=numVirtualPages;
+    
+    // Now we have to copy the address spaces into the main memory
+    unsigned startAddress = currentThread->space->KernelPageTable[0].physicalPage * PageSize;
+    unsigned destinationAddress = KernelPageTable[0].physicalPage*PageSize;
+    for(i=0;i<size;i++){
+        machine->mainMemory[destinationAddress+i]=machine->mainMemory[startAddress+i];
+    }
 }
 
 //----------------------------------------------------------------------

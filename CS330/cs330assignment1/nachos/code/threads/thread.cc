@@ -32,11 +32,13 @@
 //----------------------------------------------------------------------
 
 static int globalThreadCounter = 0;
+static int numThreads = 0;
 NachOSThread::NachOSThread(char* threadName)
 {
     wakeUpParent = 0;
     allChildren = new List();
     exitedChildren = new List();
+    ++numThreads;
     pid = ++globalThreadCounter;
     name = threadName;
     stackTop = NULL;
@@ -121,17 +123,6 @@ NachOSThread::ThreadFork(VoidFunctionPtr func, int arg)
     (void) interrupt->SetLevel(oldLevel);
 }
 
-void
-NachOSThread::ThreadJoin(int childPID){
-    if(exitedChildren->Find(childPID)){} //do nothing just return
-    else{
-        NachOSThread* child = (NachOSThread*) allChildren->Search(childPID); //Get a pointer to alive child
-        child->wakeUpParent = 1;    // make that child wake up parent when it finishes
-        currentThread->PutThreadToSleep();
-    }
-}
-
-
 //----------------------------------------------------------------------
 // NachOSThread::CheckOverflow
 // 	Check a thread's stack to see if it has overrun the space
@@ -180,15 +171,21 @@ NachOSThread::FinishThread ()
     (void) interrupt->SetLevel(IntOff);		
     ASSERT(this == currentThread);
     
+    numThreads--;
+
     if(parent == NULL) interrupt->Halt() ;    
-    if(wakeUpParent == 1){
+    else if(wakeUpParent == 1){
         // put the parent thread in ready list.
-        scheduler->MoveThreadToReadyQueue(parent);
+        scheduler->MoveThreadToReadyQueue(currentThread->parent);
     }
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
     
+    if(numThreads==0){
+        interrupt->Halt();
+    }
+
     threadToBeDestroyed = currentThread;
-    parent->exitedChildren->Append(new ListElement(NULL, getPID()));
+       
     PutThreadToSleep();					// invokes SWITCH
     // not reached
 }
@@ -221,12 +218,14 @@ NachOSThread::YieldCPU ()
     
     DEBUG('t', "Yielding thread \"%s\"\n", getName());
     
+    //printf("Yielding thread\n");
     nextThread = scheduler->SelectNextReadyThread();
     if (nextThread != NULL) {
 	scheduler->MoveThreadToReadyQueue(this);
 	scheduler->ScheduleThread(nextThread);
     }
     (void) interrupt->SetLevel(oldLevel);
+    //printf("Yielded!!\n");
 }
 
 //----------------------------------------------------------------------
@@ -343,6 +342,15 @@ NachOSThread::SaveUserState()
 	  userRegisters[i] = machine->ReadRegister(i);
        stateRestored = false;
     }
+}
+
+//----------------------------------------------------------------------
+//NachOSThread::SetRegisters
+//Set the user_register values for the thread
+//----------------------------------------------------------------------
+void
+NachOSThread::SetRegisters(unsigned regno,int val){
+    userRegisters[regno] = val;
 }
 
 //----------------------------------------------------------------------

@@ -72,26 +72,25 @@ List::~List()
 //		anything.
 //----------------------------------------------------------------------
 
-bool
-List::Find(int pid){
-    ListElement* temp = this->first;
-    while(temp!=NULL && temp->key != pid){
+void * 
+List::Search(int pid){
+    ListElement* temp;
+    temp = first;
+    if(temp==NULL){
+        //printf("Return NULL(-1729)");
+        return (void *)(-1729);
+    }
+    //printf("Searching\n");
+    while(temp->key != pid){
         temp = temp->next;
     }
-
-    if(temp->key == pid) return true;
-    return false;
-}
-
-void* List::Search(int pid){
-    ListElement* temp = this->first;
-    while(temp!=NULL && temp->key != pid){
-        temp = temp->next;
-                        }
             
-    if(temp->key == pid) return (void*) temp->item;
-    return NULL;
-
+    if(temp->key == pid){
+        //printf("Returning\n");
+        return temp->item;
+    }
+    //printf("Returning nothing!!\n");
+    return (void *)(-1729);
 }
 
 void

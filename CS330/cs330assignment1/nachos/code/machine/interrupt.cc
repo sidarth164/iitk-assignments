@@ -215,7 +215,7 @@ Interrupt::Idle()
     status = IdleMode;
     if (CheckIfDue(TRUE)) {		// check for any pending interrupts
     	while (CheckIfDue(FALSE))	// check for any other pending 
-	    ;				// interrupts
+	               ;				// interrupts
         yieldOnReturn = FALSE;		// since there's nothing in the
 					// ready queue, the yield is automatic
         status = SystemMode;

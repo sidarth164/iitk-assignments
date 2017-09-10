@@ -59,21 +59,18 @@ TimerInterruptHandler(int dummy)
 {
     if (interrupt->getStatus() != IdleMode)
 	interrupt->YieldOnReturn();
-    
-    int wakeTime;
+
+    //printf("TimerInterruptHandler called!!\n");
+
     NachOSThread* thread_in_focus;
 
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
 
     //Check the list of sleeping threads if anyone has to be awoken!!
-    while(!(sleeping_threads->IsEmpty())){
-        thread_in_focus =(NachOSThread*)sleeping_threads->SortedRemove(&wakeTime);
-        if(wakeTime <= stats->totalTicks){
-            scheduler->MoveThreadToReadyQueue(thread_in_focus);
-        }
-        else{
-            sleeping_threads->SortedInsert(thread_in_focus,wakeTime);
-        }
+    while(!(sleeping_threads->IsEmpty()) && sleeping_threads->first->key <= stats->totalTicks && sleeping_threads->first->key > 0){
+        //printf("Thread woken up at time %d\n",stats->totalTicks);
+        thread_in_focus =(NachOSThread*)sleeping_threads->Remove();
+        scheduler->MoveThreadToReadyQueue(thread_in_focus);
     }
 
     (void) interrupt->SetLevel(oldLevel);

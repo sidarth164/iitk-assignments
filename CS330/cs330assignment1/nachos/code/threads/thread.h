@@ -87,7 +87,6 @@ class NachOSThread {
 					// is called
 
     // basic thread operations
-    void ThreadJoin(int childPID);
     void ThreadFork(VoidFunctionPtr func, int arg); 	// Make thread run (*func)(arg)
     void YieldCPU();  				// Relinquish the CPU if any 
 						// other thread is runnable
@@ -95,6 +94,7 @@ class NachOSThread {
 						// relinquish the processor
     void FinishThread();  				// The thread is done executing
     
+    NachOSThread* parent; 
     void CheckOverflow();   			// Check if thread has 
 						// overflowed its stack
     int getPID();
@@ -103,6 +103,9 @@ class NachOSThread {
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
+    List* allChildren;
+    List* exitedChildren;
+    int wakeUpParent;
 
   private:
     // some of the private data for this class is listed above
@@ -112,13 +115,9 @@ class NachOSThread {
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
-    NachOSThread* parent;
     void CreateThreadStack(VoidFunctionPtr func, int arg);
     					// Allocate a stack for thread.
 					// Used internally by ThreadFork()
-    List* allChildren;
-    List* exitedChildren;
-    int wakeUpParent;
     int pid, ppid;			// My pid and my parent's pid
 
 #ifdef USER_PROGRAM
@@ -132,7 +131,7 @@ class NachOSThread {
   public:
     void SaveUserState();		// save user-level register state
     void RestoreUserState();		// restore user-level register state
-
+    void SetRegisters(unsigned regno,int val);  // Sets the value of the user register of the thread
     ProcessAddressSpace *space;			// User code this thread is running.
 #endif
 };

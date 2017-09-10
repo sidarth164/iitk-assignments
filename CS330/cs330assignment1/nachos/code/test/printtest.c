@@ -17,6 +17,7 @@ main()
 {
     syscall_wrapper_PrintString("hello world\n");
     syscall_wrapper_PrintString("Executed ");
+    syscall_wrapper_Sleep(5000);
     syscall_wrapper_PrintInt(syscall_wrapper_GetNumInstr());
     syscall_wrapper_PrintString(" instructions.\n");
     return 0;

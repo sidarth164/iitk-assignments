@@ -48,7 +48,6 @@ class List {
     void Prepend(void *item); 	// Put item at the beginning of the list
     void Append(void *item); 	// Put item at the end of the list
     void *Remove(); 	 	// Take item off the front of the list
-    bool Find(int pid);
     void* Search(int pid);
     void Mapcar(VoidFunctionPtr func);	// Apply "func" to every element 
 					// on the list
@@ -59,7 +58,6 @@ class List {
     void SortedInsert(void *item, int sortKey);	// Put item into list
     void *SortedRemove(int *keyPtr); 	  	// Remove first item from list
 
-  private:
     ListElement *first;  	// Head of the list, NULL if list is empty
     ListElement *last;		// Last element of list
 };

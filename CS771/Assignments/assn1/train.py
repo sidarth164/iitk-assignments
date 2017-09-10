@@ -14,21 +14,24 @@ def main():
     Xtr = tr_data[0].toarray(); # Converts sparse matrices to dense
     Ytr = tr_data[1]; # The trainig labels
     
+    Xtr=Xtr[0:10000]
+    Ytr=Ytr[0:10000]
     # Cast data to Shogun format to work with LMNN
     features = RealFeatures(Xtr.T)
     labels = MulticlassLabels(Ytr.astype(np.float64))
 
+    print("Running LMNN!!")
     ### Do magic stuff here to learn the best metric you can ###
 
     # Number of target neighbours per example - tune this using validation
-    k = 1
+    k = 13
     
     # Initialize the LMNN package
     lmnn = LMNN(features, labels, k)
     init_transform = np.eye(Xtr.shape[1])
 
     # Choose an appropriate timeout
-    lmnn.set_maxiter(2000)
+    lmnn.set_maxiter(10000)
     lmnn.train(init_transform)
 
     # Let LMNN do its magic and return a linear transformation

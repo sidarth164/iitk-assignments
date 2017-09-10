@@ -71,6 +71,36 @@ static void ConvertIntToHex (unsigned v, Console *console)
    }
 }
 
+//----------------------------------------------------------------------
+// void Context(int arg)
+// Function which handles the initializtion of the thread in place of 
+// SchedulThread
+//----------------------------------------------------------------------
+
+void
+Context(int arg){
+    DEBUG('t', "Now in thread \"%s\"\n", currentThread->getName());
+
+    // If the old thread gave up the processor because it was finishing,
+    // we need to delete its carcass.  Note we cannot delete the thread
+    // before now (for example, in NachOSThread::FinishThread()), because up to this
+    // point, we were still running on the old thread's stack!
+    if (threadToBeDestroyed != NULL) {
+        delete threadToBeDestroyed;
+        threadToBeDestroyed = NULL;
+    }
+
+#ifdef USER_PROGRAM
+    if (currentThread->space != NULL) {     // if there is an address space
+        currentThread->RestoreUserState();     // to restore, do it.
+        currentThread->space->RestoreContextOnSwitch();
+    }
+
+    machine->Run();
+#endif
+}
+
+//---------------------------------------------------------------------
 void
 ExceptionHandler(ExceptionType which)
 {
@@ -205,22 +235,24 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if((which == SyscallException) && (type == SysCall_Sleep)){
+       unsigned int sleep_time = machine->ReadRegister(4);
+
        // Advance program counters.
        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-
-       unsigned int sleep_time = machine->ReadRegister(4);
-
+        
+       //printf("\nCurrent Time (before sleep): %d\n",stats->totalTicks);
+       //printf("Expected wake up time: %d\n",stats->totalTicks+sleep_time);
        if(sleep_time == 0){
           currentThread->YieldCPU();
        }
        else{
           IntStatus oldLevel = interrupt->SetLevel(IntOff);
-
+          //printf("Putting this thread to sleep...\n");  
           sleeping_threads->SortedInsert(currentThread,stats->totalTicks+sleep_time);
-
           currentThread->PutThreadToSleep();
+          //printf("New thread obtained\n");  
           (void) interrupt->SetLevel(oldLevel);
        }
     }
@@ -243,12 +275,49 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if ((which == SyscallException) && (type == SysCall_Exit)) {
-        currentThread->FinishThread();
+       int exitCode =  machine->ReadRegister(4);
+       if(currentThread->parent!=NULL)
+       currentThread->parent->exitedChildren->SortedInsert((void *)exitCode,currentThread->getPID());
+       //currentThread->parent->exitedChildren->Append(new ListElement(NULL, getPID()));
+       currentThread->FinishThread();
     }
 
     else if ((which == SyscallException) && (type == SysCall_Join)) {
-        int pid = (int) machine->ReadRegister(4);
-        currentThread->ThreadJoin(pid);
+        int pid = machine->ReadRegister(4);
+        NachOSThread *child;
+
+        //printf("Joining...\n");
+
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+        int *exitCode;
+        exitCode = (int *)(currentThread->exitedChildren->Search(pid));
+        
+        //if(exitCode!=NULL)
+        //printf("exit code = %d\n",(int)exitCode);
+
+        // exitCode=-1 denotes that child has not exited yet or no such child is present
+        if((int)exitCode == -1729){
+            child = (NachOSThread *)currentThread->allChildren->Search(pid);
+            
+            if(child != NULL){
+                child->wakeUpParent = 1;
+                currentThread->PutThreadToSleep();
+            }
+            else{
+                machine->WriteRegister(2,-1);
+            }
+
+        }
+        else{
+            machine->WriteRegister(2,(int)exitCode);
+        }
+
+        (void) interrupt->SetLevel(oldLevel);
+        // Advance Program Counters
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
     else if((which == SyscallException) && (type == SysCall_Exec)){
         vaddr = machine->ReadRegister(4);
@@ -287,7 +356,39 @@ ExceptionHandler(ExceptionType which)
                             // machine->Run never returns;
                             // the address space exits
                             // by doing the syscall "exit"       
-    }    
+    }
+    else if((which == SyscallException) && (type == SysCall_Fork)){
+        NachOSThread* forked_child = new NachOSThread("Forked_child:new");
+        
+        // Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+        
+        // Adding the newly created child to the list of children the current thread has
+        forked_child->parent->allChildren->SortedInsert(forked_child,forked_child->getPID());
+        ProcessAddressSpace *space=new ProcessAddressSpace();
+        
+        // Assigning the newly created space to the newly created forked child
+        forked_child->space = space;
+      
+        // Saving the user registers of the child so that it starts executin from the next PC after being called
+        forked_child->SaveUserState();
+        forked_child->SetRegisters(2,0);    // return value of the child thread should be zero
+
+        // Calling the NachOSThread::ThreadFork function
+        forked_child->ThreadFork(Context,(int) forked_child);
+       
+        /*
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        scheduler->MoveThreadToReadyQueue(forked_child);    // MoveThreadToReadyQueue assumes that interrupts 
+                    // are disabled!
+        (void) interrupt->SetLevel(oldLevel);
+        */
+
+        //Setting the return value of the parent thread as the PID of the child
+        machine->WriteRegister(2,forked_child->getPID());
+    }
     else {
 	printf("Unexpected user mode exception %d %d\n", which, type);
 	ASSERT(FALSE);
