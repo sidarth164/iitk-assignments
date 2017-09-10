@@ -1,0 +1,15 @@
+SysCall_Join:
+It implements the feature where the parent process waits for its child to terminate before moving further. The parent has the list of all its child and all its exited child. Since parent should be able join only its children, we check whether the process which should be joined is its child or not. If not we return -1. If the child to be joined is alive, parent changes wakeUpParent field of its child to wake the parent up when child terminates and then the parent goes to sleep.
+
+SysCall_Exit:
+The process which is to exit shuts off interrupts, checks whether it needs to wake up his parent in case the parent is waiting(using his wakeUpParent field). When a process is being destructed, its parent is fetched to update the exitedChild list.
+It then updates the threadToBeDestroyed paramter so that the next process can destroy it. In case it is last process to exit, it halts the machine.
+
+SysCall_NumInstr:
+Each process keep a count of number of instructions executed by it. We return the value of that variable(numInstr) in this function.
+
+SysCall_Exec:
+This creates a new process, allocates address space to it. We set the initial register values to it anf then load page table register. Once the state of process is ready we run it by calling machine->run()
+
+SysCall_Fork:
+This function creates a new process running along with other process. While creating a process we assign address space to it and update its parent allChildren list. We save user register of child and return the new process's PID to its parent.
