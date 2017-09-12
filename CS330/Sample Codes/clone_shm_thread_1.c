@@ -10,6 +10,9 @@
 #define CHILD_STACK 16384
 #define SIZE 1000000000
 
+#define _GNU_SOURCE  
+#include <linux/sched.h>        /* or #include <sched.h> */
+
 /* Contains poor code for waiting on completion of the threads.
 */
 
