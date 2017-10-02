@@ -19,4 +19,4 @@
 ## Lec09
 >__Exercise 3__
 - How to solve question 3? I mean that other than considering individually i!=j|j!=k|k!=i is there any other way??
-	- How to solve question 4? I get that we can divide it into 2 subproblems - {xy | |x|=|y| and x!=y} and {x| |x| is odd}, but how to solve these?
+- How to solve question 4? I get that we can divide it into 2 subproblems - {xy | |x|=|y| and x!=y} and {x| |x| is odd}, but how to solve these?
