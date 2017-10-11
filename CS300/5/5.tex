@@ -1,0 +1,82 @@
+\documentclass[twoside]{article}
+\usepackage{CS300}
+
+\begin{document}
+%FILL IN THE RIGHT INFO.
+%\lecture{**LECTURE-NUMBER**}{**DATE**}{**LECTURER**}{**SCRIBE**}
+\lecture{1}{January 17}{Himanshu Shukla}{Siddharth Agrawal}
+%\footnotetext{These notes are partially based on those of Nigel Mansell.}
+
+% ** YOUR NOTES GO HERE:
+
+% Some general latex examples and examples making use of the
+% macros follow.  
+%**** IN GENERAL, BE BRIEF. LONG SCRIBE NOTES, NO MATTER HOW WELL WRITTEN,
+%**** ARE NEVER READ BY ANYBODY.
+\section{Ideals}
+    From henceforth $R$ will denote a commutative ring with the multiplicative identity.\\
+    \begin{definition} A set $I \subseteq R$ is an {\it ideal} of $R$ if:
+    \begin{enumerate}
+        \item[-] $I$ is a subgroup of $R$ under addition.
+        \item[-] $\forall r \in R$,  $r\bullet I \subseteq I$
+    \end{enumerate}
+    \end{definition}
+    Here is a list of few basic definitions from ring theory
+    \begin{itemize}
+         
+    \item An ideal is said to be \emph{proper} if $I\subsetneqq R$.\\
+    \item A proper ideal $I$ is said to be a \textbf{Maximal} if for an ideal $J$ of $R$, $I\subsetneqq J$ then $J=R$.
+    \item An ideal $P$ is said to be {\it prime} if $$\alpha\bullet\beta\in P\Rightarrow \alpha\in P \mid \beta \in P$$
+    \end{itemize}
+    
+    {\bf Lemma.} $R\backslash I$ is a field or an integral domain {\it iff} $I$ is a maximal ideal or $I$ is a prime ideal respectively.
+    
+\section{Module}
+    A {\it module} can be thought of as a vector space over a ring (instead of a field).\\
+    {\bf Definition.} A module $M$ over a ring $R$ is such that $\exists\varphi : R\times M\to M$ satisfying:
+    \begin{enumerate}
+        \item[-] $r_1({r_2}\bullet m) = ({r_1}{r_2})\bullet m$
+        \item[-] $({r_1}+{r_2})\bullet m = {r_1}\bullet m + {r_2}\bullet m$
+        \item[-] $r\bullet ({m_1}+{m_2}) = r\bullet {m_1} + r\bullet {m_2}$
+    \end{enumerate}
+    {\it Example:} Every ideal is a module over its underlying ring.
+    
+\section{Extensions of Fields}
+    If a field $F \subset E$, then $E$ is said to be an {\it extension} of $F$.
+    It is trivial to see that $E$ forms a vector space over the field $F$. Depending on the finiteness of the basis of this vector space, we have {\it finite} or {\it infinite} extensions.\\
+    $(\overline{\mathbb{Q}} : \mathbb{Q}) :=$ $\overline{\mathbb{Q}}$ is an extension of $\mathbb{Q}$.\\
+    $[E:F] :=$ dimension of the vector space $E$ over the field $F$.\\
+    \\
+    {\bf Note.} Integral Domain $\supset$ Unique Factorisation Domain $\supset$ Principle Ideal Domain $\supset$ Euclidean Domain $\supset$ Field\\
+    \\
+    {\bf Definition.} $R$ is a {\it Euclidean domain} if $\exists$ a map $\varphi :R\to Z_+$ such that $\forall a,b\in R, b\neq 0, \exists q,r$ such that $$a = bq+r,\ \varphi(b)>\varphi(r)\ or\ r=0$$
+    {\it Example:} $F[x]$ is a Euclidean domain.\\
+    \\
+    {\bf Definition.} $R$ is a principle ideal domain (PID) if $\forall p,q\in R$, $\exists x,y$ s.t., $$ px+qy=gcd(p,q)$$
+    {\it Note:} If $R$ is a PID, but not a Euclidean domain, then we dont have a algorithm to find these $x$ and $y$ values, although it is proven that they must exist.\\
+    \\
+    Let $\alpha \in\ E\ \supseteq\ F$, then $\alpha$ is called {\it algebraic} over $F$ if\\ $\exists ({a_0}, {a_1}, ...... , {a_n}) \in {{\mathbb{F}}_{n+1}}$ s.t., $${a_0}+{a_1}\alpha+ ......+{a_n}{{\alpha}^n}=0$$ i.e. $\exists\ p(x) \in F[x]$ s.t. $p(\alpha)=0$.\\
+    An extension $E$ of a field $F$ is said to be algebraic if every element of $E$ is algebraic over $F$.\\
+    \\
+    Let $\varphi\ : F[X]\to E$, $ X\mapsto\alpha$ \\
+    {\bf Observation.} $\alpha$ is algebraic {\it iff} $\varphi$ has a non-trivial kernel.\\
+    \\
+    Now, by the second isomorphism theorem, $$\frac{F[X]}{ker(\varphi)} \cong F[\alpha]$$. Since $F[X]$ is a Euclidean domain. therefore F[X] is definitely a PID. Also, $ker(\varphi)$ is an ideal under all circumstances. Therefore, $ker(\varphi)$ has to be a principle ideal of $F[X]$, $$\Rightarrow \exists\  p(X)\in F[X]\ s.t.\ ker(\varphi)= \left(p(X)\right)$$
+    \noindent
+    {\bf Claim.} $p(X)$ is unique and irreducible, \& $p(\alpha)=0$.\\
+    {\it (Proof left as an Exercise)}\\ 
+    \\ \noindent
+    {\bf Proposition.} If $E$ is finite over $F$, then $E$ is algebraic over $F$.\\
+    {\it Proof:} $\forall\alpha\in E, \exists n$ s.t. $1,\alpha, ..... , {\alpha}^n$ is linearly dependant.\\
+    \\ \noindent
+    {\bf Theorem.} Let $K\subseteq F\subseteq E$ be fields, then $$ [F:K][E:F]=[E:K]$$
+    {\it Note:} We have not assumed anything regarding the finiteness of $F$ and $E$ as extensions, i.e. this theorem is valid even for infinite bases.\\
+    If $({\alpha}_i),\ i\in I$ is an infinite basis of a vector space $E$ over a fiels $F$, then $$\forall \beta\in E,\ \beta = \sum_{i\in I}{c_i}{{\alpha}_i},\  where\ only\ finitely\ many\ c_i\neq0$$\\
+    \\ \noindent
+    Let $K(\alpha)$ be the smallest field containing $\alpha$ nad $K$, i.e. it is the smallest extension of the field $K$ that contains $\alpha$.\\
+    \\ \noindent
+    {\bf Proposition.} (i) $K[\alpha] = K(\alpha)$ \hspace{1.5cm} (ii) $[K(\alpha):K]=deg(Irr(\alpha,K,X))$
+
+
+
+\end{document}
