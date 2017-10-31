@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage[section]{placeins}
+\author{}
+\title{CS330 : Assignment 2}
+\renewcommand*\rmdefault{iwona}
+\begin{document}
+\maketitle
+\section*{\centering{Part I:}}
+	\def\arraystretch{1.5}
+	\begin{table}[!htb]
+		
+			\caption{Batch 1 Data}
+		\begin{tabular}{ |c|c|c|c| }
+			\hline
+			\textbf{No.} & \textbf{Algorithm} & \textbf{CPU Utilization} & \textbf{Average Wait Ticks} \\ \hline
+			1     &       Default NachOS  &                               56.214733\%			&       24464.3  \\      \hline
+			2       &       Shortest        CPU     Burst   First   &               56.214733\%     &       24464.3  \\      \hline 
+			3       &       Round   Robin   (Time   Quantum :       31)&    60.474148\%     &       76906.8  \\      \hline
+			4       &       Round   Robin   (Time   Quantum :       62)&    59.77042\%      &       76430.1  \\      \hline
+			5       &       Round   Robin   (Time   Quantum :       93)&    60.290195\%     &       76390.4  \\      \hline
+			6       &       Round   Robin   (Min.   Quantum :       20)&    60.628101\%     &       74826.0  \\      \hline
+			7       &       UNIX    Scheduler       (Time   Quantum :       31)&    60.40551\%      &       78546.0  \\      \hline 
+			8       &       UNIX    Scheduler       (Time   Quantum :       62)&    60.444427\%     &       77991.4  \\      \hline 
+			9       &       UNIX    Scheduler       (Time   Quantum :       93)&    60.221901\%     &       78265.0  \\      \hline 
+			10      &       UNIX    Scheduler       (Min.   Quantum :       20)&    60.314232\%     &       78636.8  \\      \hline 
+			
+		\end{tabular}
+	
+	\end{table}
+
+
+	\begin{table}[!htb]
+		\caption{Batch 2 Data}
+		\begin{tabular}{ |c|c|c|c| }
+			\hline
+			\textbf{No.} & \textbf{Algorithm} & \textbf{CPU Utilization} & \textbf{Average Wait Time} \\ \hline
+			1	&	Default	NachOS	&				82.866562\%	&	24410.3	\\	\hline
+			2	&	Shortest	CPU	Burst	First	&		82.866562\%	&	24410.3	\\	\hline
+			3	&	Round	Robin	(Time	Quantum	:	31)&	87.307915\%	&	76024.4	\\	\hline
+			4	&	Round	Robin	(Time	Quantum	:	62)&	87.615372\%	&	76965.8	\\	\hline
+			5	&	Round	Robin	(Time	Quantum	:	93)&	87.262978\%	&	75350.7	\\	\hline
+			6	&	Round	Robin	(Min.	Quantum	:	20)&	86.8423\%	&	79319.8	\\	\hline
+			7	&	UNIX	Scheduler	(Time	Quantum	:	31)&	87.089897\%	&	78330.1	\\	\hline
+			8	&	UNIX	Scheduler	(Time	Quantum	:	62)&	87.530113\%	&	78627.4	\\	\hline
+			9	&	UNIX	Scheduler	(Time	Quantum	:	93)&	86.654839\%	&	78102.0	\\	\hline
+			10	&	UNIX	Scheduler	(Min.	Quantum	:	20)&	87.68943\%	&	77538.7	\\	\hline
+				
+		\end{tabular}
+		
+	\end{table}
+
+
+	\begin{table}[!htb]
+		\caption{Batch 3 Data}
+		\begin{tabular}{ |c|c|c|c| }
+			\hline
+			\textbf{No.} & \textbf{Algorithm} & \textbf{CPU Utilization} & \textbf{Average Wait Time} \\ \hline
+			1	&	Default	NachOS					&	    94.724182\%	&	24410.3	\\	\hline
+			2	&	Shortest	CPU	Burst	First	&		94.724182\%	&	24410.3	\\	\hline
+			3	&	Round	Robin	(Time	Quantum	:	31)&	98.941071\%	&	75845.6	\\	\hline
+			4	&	Round	Robin	(Time	Quantum	:	62)&	98.905609\%	&	76390.0	\\	\hline
+			5	&	Round	Robin	(Time	Quantum	:	93)&	99.103897\%	&	75304.2	\\	\hline
+			6	&	Round	Robin	(Min.	Quantum	:	20)&	98.434746\%	&	79040.2	\\	\hline
+			7	&	UNIX	Scheduler	(Time	Quantum	:	31)&	98.467751\%	&	77917.8	\\	\hline
+			8	&	UNIX	Scheduler	(Time	Quantum	:	62)&	98.735733\%	&	78231.4	\\	\hline
+			9	&	UNIX	Scheduler	(Time	Quantum	:	93)&	98.370903\%	&	78108.8	\\	\hline
+			10	&	UNIX	Scheduler	(Min.	Quantum	:	20)&	98.254745\%	&	76543.8	\\	\hline
+			
+		\end{tabular}
+	
+	\end{table}
+
+
+	\begin{table}[!htb]
+		\caption{Batch 4 Data}
+		\begin{tabular}{ |c|c|c|c| }
+			\hline
+			\textbf{No.} & \textbf{Algorithm} & \textbf{CPU Utilization} & \textbf{Average Wait Time} \\ \hline
+			1	&	Default	NachOS	&				99.864647\%	&	36632.0	\\	\hline
+			2	&	Shortest	CPU	Burst	First	&		99.864647\%	&	36632.0	\\	\hline
+			3	&	Round	Robin	(Time	Quantum	:	31)&	99.867081\%	&	81102.0	\\	\hline
+			4	&	Round	Robin	(Time	Quantum	:	62)&	99.867065\%	&	81102.0	\\	\hline
+			5	&	Round	Robin	(Time	Quantum	:	93)&	99.866936\%	&	80607.0	\\	\hline
+			6	&	Round	Robin	(Min.	Quantum	:	20)&	99.867081\%	&	81102.0	\\	\hline
+			7	&	UNIX	Scheduler	(Time	Quantum	:	31)&	99.867081\%	&	81190.0	\\	\hline
+			8	&	UNIX	Scheduler	(Time	Quantum	:	62)&	99.867081\%	&	81190.0	\\	\hline
+			9	&	UNIX	Scheduler	(Time	Quantum	:	93)&	99.866951\%	&	80787.0	\\	\hline
+			10	&	UNIX	Scheduler	(Min.	Quantum	:	20)&	99.867081\%	&	81190.0	\\	\hline
+			
+		\end{tabular}
+	
+		\subsection*{Explaination: } We ran the program for various values of time quantum( starting from 124 and decreasing all the way to 24, decreasing 5 tick per iteration). The CPU utilization came out to decreasing with one/two slight jumps. So we ran for 20 ticks which is the lower bound we are allowed to go and it turned out to work best at 20 ticks. 
+		
+	\end{table}
+	
+\section*{\centering{Part II:}}
+	The default NachOS Scheduling algorithm 1 runs the processes in non-preemptive first come first serve basis. Hence each process in batch will yield after running a outer loop. The order of running process are thus fixed and its surely less efficient way for getting average wait time. The shortest burst first algorithm would be near ideal choice which is not happening here.However the second algorithm tries to estimate next burst time of process using exponential averaging technique and runs the one with shortest estimated burst time. Thus it will perform better in reducing average waiting time.
+	 
+\begin{table}[!htb]
+	\caption{Batch 5 Data}
+	\begin{tabular}{ |c|c|c|c| }
+		\hline
+		\textbf{No.} & \textbf{Algorithm} & \textbf{CPU Utilization} & \textbf{Average Wait Time} \\ \hline
+		1	&	Default	NachOS	&			99.822090	\%	&	55505	\\	\hline
+		2	&	Shortest	CPU	Burst	First	&	99.822090	\%	&	40250	\\	\hline
+	\end{tabular}
+
+	
+\end{table}
+		
+
+
+\section*{\centering{Part III:}}
+	The overall CPU burst estimation error for non-preemptive shortest burst first algorithm is given below in table with required ratios.
+	On increasing the value of OUTER\_BOUND from 4 to 8, the value of the error drops by good margin. Higher are the number of iterations, more the algorithm is able to better predict
+	the correct next CPU Burst using exponential averaging technique. Thus we are able to see such good decrease in error ratio.
+	In the case of the testloop3 we are not able to witness this improvement as it does not yields between iterations and thus complete individual programs runs in a single CPU burst and the scheduling algorithmdoesn't get to choose between programs processes and thus does not affects anything.
+	testloop has syscall\_wrapper\_PrintInt which make the thread to yield because of the I/O instruction and
+	thus its behavior is similar to other programs with yield in their loop iteration.
+
+\begin{table}[!htb]
+	\caption{CPU Burst Estimation Error}
+	\begin{tabular}{ |c|c|c|c| }
+		\hline
+		\textbf{No.} & \textbf{Batch} & \textbf{Outer Bound 4 } & \textbf{Outer Bound 8} \\ \hline
+		1	&	Batch1	&			0.702529		&	0.474458	\\	\hline
+		2	&	Batch2	&	0.742730		&	0.486611	\\	\hline
+		3	&	Batch3	&	0.741945		&	0.482902	\\	\hline
+		4	&	Batch4	&	0		&		0	\\	\hline
+		5	&	Batch5	&	0.481610		&	0.248984	\\	\hline
+	\end{tabular}
+	
+	
+\end{table}
+
+
+
+\section*{\centering{Part IV:}}
+The completion time statistics data is given below in table.
+
+Explanations:
+Round Robin algorithm executes the the processes one by one in circular fashion using a 100 tick time quantum.\\
+Unix schedular model uses CPUUsage value to decide priorities of processes and schedules them on basis of them.\\
+A process having a very large priority has a high probability of getting scheduled early. This program terminates early and thus there is a significant difference
+in the minimum waiting time.\\
+Round robin handles all processes with equal priority by scheduling them in a circular fashion. Thus threads exit nearly after the same time interval. Hence the max - min value is small forRound-Robin scheduler when compared to Unix Scheduler model.
+
+	
+\end{document}
