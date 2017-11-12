@@ -1,0 +1,31 @@
+Contents:
+
+  Sample course handouts for undergraduate operating system course
+  using Nachos.
+
+Generic:
+
+	course.tex 	course syllabus, and assignment dates
+
+	overview.tex 	overview of Nachos project
+
+	mechanics.tex 	mechanics of finding the code and turning in assignments
+			(will vary from school to school)
+
+	nethelp.tex 	overview of how network protocols work (a weak area
+     			in many OS textbooks)
+
+	reading.ms	sample reading list, to supplement standard textbooks
+
+
+Sample assignments:
+
+	thread.tex 	concurrency and threads 
+
+	userprog.tex 	multiprogramming and system calls 
+
+	vm.tex 		virtual memory and TLB handling 
+
+	filesys.tex	file system 
+
+	network.tex	network protocol and distributed system 

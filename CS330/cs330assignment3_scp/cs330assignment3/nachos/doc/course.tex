@@ -1,0 +1,147 @@
+\documentstyle{article}
+
+\begin{document}
+\begin{center}
+\large
+{\bf CS 162 -- Operating Systems and Systems Programming}\\
+Course Information\\
+August 23, 1993
+\end{center}
+
+\begin{description}
+
+\item{Instructor:}  Tom Anderson (tea@cs)
+\item{Office:} 521 Evans Hall
+\item{Office Hours:} Monday 1--2, Wednesday 3--4 
+
+\item{T.A.'s:} Drew Roselli (drew@cs)\\
+Curtis Yarvin (curtis@cs)
+
+\item{T.A. Office Hours:} Time and location TBD
+
+\item{Course Description:}
+The purpose of this course is to teach the design of operating systems.
+
+\item{Course Prerequisites:} CS 60B, 60C, and a familiarity with C.
+
+\item{Grading:} Grades will be (roughly) computed as follows:\\
+Final exam: 40\%, midterm: 20\%, and the project: 40\%.
+The exams are graded on a curve (to correct for an overly easy or
+overly hard exam); the project grades are {\em not} curved, however.
+
+\item{Midterm and Final:} Both the midterm and the final will be given 
+{\em in common}, approximate dates and times listed below.  
+Both exams will be closed book, and will cover material from 
+lecture, sections, the required readings, and the project.
+
+\item{Project:}  The project in this course is to build an operating 
+system for a simulated MIPS-style
+workstation.  The project consists of five phases: thread management,
+multiprogramming, virtual memory, file systems, and distributed systems.
+We will use flexible slip dates for the project.
+Further details about the project will be covered in later handouts.
+
+\item{Readings:} ``Operating System Concepts, 3rd Edition,'' Silberschatz, Peterson, and Galvin\\
+A set of papers from Copy Central on Euclid; I will let you know when they
+are available.
+
+You may find it convenient to have a copy of ``The C++ Programming
+Language'' by Stroustrup and ``The MIPS RISC Architecture'' by Kane,
+but they are not required.  Although the programming assignments
+will be in C++, we will give you a handout that describes what
+you need to know about C++.
+
+\end{description}
+\newpage
+
+\begin{center}
+{\large {\bf Course Outline and Approximate Dates}}
+\end{center}
+
+\begin{description}
+
+\item{Aug. 23:} Introduction and historical perspective\\
+% 1 lecture
+  Readings -- OSC Chap. 1, 2.1-2.2, 3.1-3.5\\
+  Hoare, The Emperor's Old Clothes
+
+\item{Aug. 25 - 30:} Threads: creating and dispatching\\
+% 3 lectures
+  Readings -- OSC Chap. 4.1-4.2
+
+\item{Sept. 1 - 10:} Synchronization: semaphores and monitors\\
+% 4 lectures
+  Readings -- OSC Chap. 5.1-5.6\\
+  Birrell, An Introduction to Programming with Threads
+
+\item{Sept. 13:} Deadlock\\
+% 1 lecture
+  Readings -- OSC Chap. 6
+
+\item{Sept. 15 - 17:} CPU scheduling\\
+% 2 lectures
+  Readings -- OSC 4.3-4.8
+
+\item{Sept. 20 - 24:} Address spaces, multiprogramming, and I/O\\
+% 3 lectures
+  Readings -- OSC Chap. 2.3-2.5, 15.1-15.5\\
+  Ritchie and Thompson, The UNIX Timesharing System
+
+\item{Sept. 21:} Assignment 1 due (threads)
+
+\item{Sept. 27 - Oct. 4:} Address translation and memory management\\
+% 4 lectures
+  Readings -- OSC Chap. 7
+
+\item{Oct. 6 - 11:} Virtual memory\\
+% 3 lectures
+  Readings -- OSC Chap. 8, 15.6\\
+  Levy and Lipman, Virtual Memory Management in VAX/VMS 
+
+\item{Oct. 12:} Assignment 2 due (multiprogramming)
+
+\item{Oct. 13 - 25:} File systems\\
+% 5 lectures
+  Readings -- OSC Chap. 9, 10.1-10.5, 10.7, 15.7 \\
+  McKusick et al., A Fast File System for UNIX
+
+\item{Oct 18:} Midterm exam 
+
+\item{Oct. 27:} Transactions\\
+% 1 lecture
+  Readings -- Gray, The Transaction Concept
+
+\item{Oct. 28:} Assignment 3 due (virtual memory)
+
+\item{Oct. 29 - Nov. 5:} Network protocols: TCP/IP and RPC\\
+% 4 lectures
+  Readings -- OSC Chap. 5.7-5.8, 12\\
+  Hedrick, Introduction to the Internet Protocols
+
+\item{Nov. 8 - 15:} Distributed applications: file systems, virtual memory, and e-mail\\
+% 4 lectures
+  Readings -- OSC Chap. 14
+
+\item{Nov. 16:} Assignment 4 due (file systems)
+
+\item{Nov. 17 - Dec. 1:} Protection and security\\
+% 6 lectures
+  Readings -- OSC Chap. 10.6, 11.1-11.2, 11.5.1, 11.7-11.10\\
+  Morris and Thompson, Password Security: A Case History
+
+\item{Dec. 3:} Operating system structure, micro and nano-kernels\\
+% 1 lectures
+  Readings -- OSC Chap. 16.1-16.3, 16.6\\
+  Anderson, The Case for Application-Specific Operating Systems
+
+\item{Dec 5:} Assignment 5 due (networking)
+
+\item{Dec 11, 12:30 - 3:30:} Final exam (tentative)
+
+\item{Project Readings:}\\
+  Christopher et al., The Nachos Instructional Operating System\\
+  Lampson, Hints for Computer System Design
+
+\end{description}
+
+\end{document}
