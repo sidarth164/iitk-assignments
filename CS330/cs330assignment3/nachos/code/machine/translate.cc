@@ -93,8 +93,10 @@ Machine::ReadMem(int addr, int size, int *value)
     
     DEBUG('a', "Reading VA 0x%x, size %d\n", addr, size);
     
+    DEBUG('z',"VirtAddr[%d] has to be translated for size=%d\n",addr,size);
     exception = Translate(addr, &physicalAddress, size, FALSE);
     if (exception != NoException) {
+    DEBUG('r',"Exception[%d] Raised!!\n",exception);
 	machine->RaiseException(exception, addr);
 	return FALSE;
     }
@@ -196,6 +198,7 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
 // check for alignment errors
     if (((size == 4) && (virtAddr & 0x3)) || ((size == 2) && (virtAddr & 0x1))){
 	DEBUG('a', "alignment problem at %d, size %d!\n", virtAddr, size);
+    DEBUG('f',"AddressErrorException Raised from translate.cc: Alignment Error\n");
 	return AddressErrorException;
     }
     
@@ -207,30 +210,34 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
 // from the virtual address
     vpn = (unsigned) virtAddr / PageSize;
     offset = (unsigned) virtAddr % PageSize;
-    
+   
     if (tlb == NULL) {		// => page table => vpn is index into table
-	if (vpn >= KernelPageTableSize) {
-	    DEBUG('a', "virtual page # %d too large for page table size %d!\n", 
-			virtAddr, KernelPageTableSize);
-	    return AddressErrorException;
-	} else if (!KernelPageTable[vpn].valid) {
-	    DEBUG('a', "virtual page # %d too large for page table size %d!\n", 
-			virtAddr, KernelPageTableSize);
-	    return PageFaultException;
-	}
-	entry = &KernelPageTable[vpn];
+    	if (vpn >= KernelPageTableSize) {
+
+            DEBUG('f',"virtAddr=%d, PageSize=%d, vpn=%d, offset=%d\n",virtAddr,PageSize,vpn,offset);
+
+    	    DEBUG('a', "virtual page # %d too large for page table size %d!\n",virtAddr, KernelPageTableSize);
+    	    DEBUG('f', "virtual page # %d too large for page table size %d!\n",virtAddr, KernelPageTableSize);
+            DEBUG('f',"AddressErrorException Raised from translate.cc: vpn too large for page table size!!\n");
+    	    return AddressErrorException;
+    	} else if (!KernelPageTable[vpn].valid) {
+    	    DEBUG('r', "virtual page # %d doesn not have a valid translation %d!\n", 
+    			virtAddr, KernelPageTableSize);
+    	    return PageFaultException;
+    	}
+    	entry = &KernelPageTable[vpn];
     } else {
         for (entry = NULL, i = 0; i < TLBSize; i++)
     	    if (tlb[i].valid && (tlb[i].virtualPage == vpn)) {
-		entry = &tlb[i];			// FOUND!
-		break;
+		        entry = &tlb[i];			// FOUND!
+		        break;
+	        }
+	    if (entry == NULL) {				// not found
+        	    DEBUG('r', "*** no valid TLB entry found for this virtual page!\n");
+        	    return PageFaultException;		// really, this is a TLB fault,
+	    					// the page may be in memory,
+	    					// but not in the TLB
 	    }
-	if (entry == NULL) {				// not found
-    	    DEBUG('a', "*** no valid TLB entry found for this virtual page!\n");
-    	    return PageFaultException;		// really, this is a TLB fault,
-						// the page may be in memory,
-						// but not in the TLB
-	}
     }
 
     if (entry->readOnly && writing) {	// trying to write to a read-only page
@@ -251,6 +258,12 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
     *physAddr = pageFrame * PageSize + offset;
     ASSERT((*physAddr >= 0) && ((*physAddr + size) <= MemorySize));
     DEBUG('a', "phys addr = 0x%x\n", *physAddr);
+    
+    //DEBUG('r',"Just Read the Page %d\n",physicalAddress/PageSize);
+    physPageLRU[pageFrame]= stats->totalTicks;
+    DEBUG('T',"Total Ticks in Translate = %d\n",stats->totalTicks);
+    LRULock[pageFrame]=TRUE;
+
     return NoException;
 }
 

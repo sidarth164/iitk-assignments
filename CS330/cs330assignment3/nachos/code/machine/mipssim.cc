@@ -247,6 +247,7 @@ Machine::OneInstruction(Instruction *instr)
       case OP_LHU:	  
 	tmp = registers[instr->rs] + instr->extra;
 	if (tmp & 0x1) {
+        DEBUG('f',"AddressErrorException raised from mipssim.cc\n");
 	    RaiseException(AddressErrorException, tmp);
 	    return;
 	}
@@ -269,6 +270,7 @@ Machine::OneInstruction(Instruction *instr)
       case OP_LW:
 	tmp = registers[instr->rs] + instr->extra;
 	if (tmp & 0x3) {
+        DEBUG('f',"AddressErrorException raised from mipssim.cc\n");
 	    RaiseException(AddressErrorException, tmp);
 	    return;
 	}
@@ -546,6 +548,7 @@ Machine::OneInstruction(Instruction *instr)
 	
       case OP_RES:
       case OP_UNIMP:
+      DEBUG('x',"Raising Illegal Instruction Exception!!\n");
 	RaiseException(IllegalInstrException, 0);
 	return;
 	

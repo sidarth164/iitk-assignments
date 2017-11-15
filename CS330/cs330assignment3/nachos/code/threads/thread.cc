@@ -95,10 +95,11 @@ NachOSThread::NachOSThread(char* threadName, int nice)
 NachOSThread::~NachOSThread()
 {
     DEBUG('t', "Deleting thread \"%s\"\n", name);
-
+    
     ASSERT(this != currentThread);
     if (stack != NULL)
 	DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
+    if(space!=NULL) delete space;
 }
 
 //----------------------------------------------------------------------
@@ -541,6 +542,7 @@ NachOSThread::JoinWithChild (int whichchild)
       printf("[pid %d] After sleep in JoinWithChild.\n", pid);
       (void) interrupt->SetLevel(oldLevel);
    }
+   DEBUG('R',"Join Successful\n");
    return childexitcode[whichchild];
 }
 

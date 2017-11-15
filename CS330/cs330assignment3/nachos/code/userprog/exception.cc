@@ -120,13 +120,13 @@ ExceptionHandler(ExceptionType which)
     else if ((which == SyscallException) && (type == SysCall_Exec)) {
        // Copy the executable name into kernel space
        vaddr = machine->ReadRegister(4);
-       machine->ReadMem(vaddr, 1, &memval);
+       while(!machine->ReadMem(vaddr, 1, &memval));
        i = 0;
        while ((*(char*)&memval) != '\0') {
           buffer[i] = (*(char*)&memval);
           i++;
           vaddr++;
-          machine->ReadMem(vaddr, 1, &memval);
+          while(!machine->ReadMem(vaddr, 1, &memval));
        }
        buffer[i] = (*(char*)&memval);
        LaunchUserProcess(buffer);
@@ -146,6 +146,7 @@ ExceptionHandler(ExceptionType which)
        else {
           exitcode = currentThread->JoinWithChild (whichChild);
           machine->WriteRegister(2, exitcode);
+          DEBUG('R',"Join Successful\n");
           // Advance program counters.
           machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
           machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
@@ -159,7 +160,10 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
        
        child = new NachOSThread("Forked thread", GET_NICE_FROM_PARENT);
+       DEBUG('F',"Allocating Space to Child\n");
        child->space = new ProcessAddressSpace (currentThread->space);  // Duplicates the address space
+       child->space->MaintainFork(currentThread->space,child->GetPID());  // Duplicates the address space
+       DEBUG('F',"SUCCESS\n");
        child->SaveUserState ();		     		      // Duplicate the register set
        child->ResetReturnValue ();			     // Sets the return register to zero
        child->CreateThreadStack (ForkStartFunction, 0);	// Make it ready for a later context switch
@@ -214,12 +218,14 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == SysCall_PrintString)) {
        vaddr = machine->ReadRegister(4);
-       machine->ReadMem(vaddr, 1, &memval);
+       DEBUG('P',"SysCall_PrintString is accessing VirtualAddress[%d]\n",vaddr);
+       while(!machine->ReadMem(vaddr, 1, &memval));
        while ((*(char*)&memval) != '\0') {
           writeDone->P() ;
           console->PutChar(*(char*)&memval);
           vaddr++;
-          machine->ReadMem(vaddr, 1, &memval);
+       DEBUG('P',"SysCall_PrintString is accessing VirtualAddress[%d]\n",vaddr);
+          while(!machine->ReadMem(vaddr, 1, &memval));
        }
        // Advance program counters.
        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
@@ -294,14 +300,56 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
     }
+    else if ((which == SyscallException) && (type == SysCall_ShmAllocate)) {
+       unsigned shmSize = machine->ReadRegister(4);  
+       DEBUG('s',"SysCall_ShmAllocate called. Size=%d\n",shmSize);
+       machine->WriteRegister(2,currentThread->space->ShmAllocate(shmSize));
+       DEBUG('s',"Shared Memory Allocation Successfully!!!\n");
+       // Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
     else if ((which == SyscallException) && (type == SysCall_NumInstr)) {
        machine->WriteRegister(2, currentThread->GetInstructionCount());
        // Advance program counters.
        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
+    else if (which == PageFaultException) {
+        NachOSThread * thread = currentThread;
+        
+        DEBUG('R',"Page Fault Exception Raised\n");
+        currentThread->SortedInsertInWaitQueue(1000+stats->totalTicks);
+        DEBUG('r',"Page Fault Exception Raised\n");
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        DEBUG('r',"interrupts turned off!!\n");
+        unsigned badvadr = machine->ReadRegister(BadVAddrReg);
+        DEBUG('R',"DEMANDING PAGE\n");
+        bool DemandPageSuccess = thread->space->DemandPage(badvadr,thread->GetPID());
+        DEBUG('R',"DemandPageSuccess\n");
+        
+        DEBUG('r',"DemandPageSuccess\n");
+
+        ASSERT(DemandPageSuccess); 
+
+        //stats->pageFaultCount++;
+        (void) interrupt->SetLevel(oldLevel);
+        
     } else {
-	printf("Unexpected user mode exception %d %d\n", which, type);
-	ASSERT(FALSE);
+	    printf("Unexpected user mode exception %d %d\n", which, type);
+        switch(which){
+            case 1 :DEBUG('x',"SyscallException\n") ;break;
+            case 2 :DEBUG('x',"PageFaultException\n") ;break;
+            case 3 :DEBUG('x',"ReadOnlyException\n") ;break;
+            case 4 :DEBUG('x',"BusErrorException\n") ;break;
+            case 5 :DEBUG('x',"AddressErrorException\n") ;break;
+            case 6 :DEBUG('x',"OverflowException\n") ;break;
+            case 7 :DEBUG('x',"IllegalInstrException\n") ;break;
+            case 8 :DEBUG('x',"NumExceptionTypes\n") ;break;
+            default: printf("Exception Not Possible\n");
+        }
+	    ASSERT(FALSE);
     }
 }

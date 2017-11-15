@@ -18,13 +18,15 @@
 
 #define UserStackSize		1024 	// increase this as necessary!
 
+
 class ProcessAddressSpace {
   public:
-    ProcessAddressSpace(OpenFile *executable);	// Create an address space,
+    ProcessAddressSpace(char* filename);	// Create an address space,
 					// initializing it with the program
 					// stored in the file "executable"
 
     ProcessAddressSpace (ProcessAddressSpace *parentSpace);	// Used by fork
+    void MaintainFork (ProcessAddressSpace *parentSpace, int child_pid);	// Used by fork
 
     ~ProcessAddressSpace();			// De-allocate an address space
 
@@ -37,6 +39,16 @@ class ProcessAddressSpace {
     unsigned GetNumPages();
 
     TranslationEntry* GetPageTable();
+
+    OpenFile *openedExecutable;
+    char* fileName;
+
+    char *backUp;
+
+    unsigned ShmAllocate(unsigned shmSize);
+    bool DemandPage(unsigned badvadr,int pid);
+    int GetNextPhysPage(int parentPhysPage);
+    void PageReplace(int ppfn);
 
   private:
     TranslationEntry *KernelPageTable;	// Assume linear page table translation

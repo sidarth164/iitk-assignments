@@ -31,17 +31,18 @@ BatchStartFunction (int dummy)
 void
 LaunchUserProcess(char *filename)
 {
-    OpenFile *executable = fileSystem->Open(filename);
-    ProcessAddressSpace *space;
+    //OpenFile *executable = fileSystem->Open(filename);
+    ProcessAddressSpace *space,*oldspace;
 
-    if (executable == NULL) {
-	printf("Unable to open file %s\n", filename);
-	return;
-    }
-    space = new ProcessAddressSpace(executable);    
+//    if (executable == NULL) {
+//	printf("Unable to open file %s\n", filename);
+//	return;
+//    }
+    space = new ProcessAddressSpace(filename);
+    oldspace = currentThread->space;
     currentThread->space = space;
-
-    delete executable;			// close file
+    
+    delete oldspace;
 
     space->InitUserModeCPURegisters();		// set the initial register values
     space->RestoreContextOnSwitch();		// load page table register
@@ -161,7 +162,7 @@ ReadInputAndFork (char *filename)
       }
       sprintf(buffer,"Thread_%d",i+1);
       NachOSThread *child = new NachOSThread(buffer, priority[i]);
-      child->space = new ProcessAddressSpace (inFile);
+      child->space = new ProcessAddressSpace (batchProcesses[i]);
       delete inFile;
       child->space->InitUserModeCPURegisters();             // set the initial register values
       child->SaveUserState ();

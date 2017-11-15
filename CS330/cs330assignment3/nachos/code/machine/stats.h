@@ -54,6 +54,10 @@ class Statistics {
     Statistics(); 		// initialize everything to zero
 
     void Print();		// print collected statistics
+
+///////////////////CUSTOM///////////////////////////////////////
+    int numPhysPages;
+////////////////////////////////////////////////////////////////
 };
 
 // Constants used to reflect the relative time an operation would
