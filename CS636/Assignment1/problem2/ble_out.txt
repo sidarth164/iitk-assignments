@@ -1,0 +1,30 @@
+./ble 1 1048576 array.txt
+Execution time: 0.0186939s
+
+./ble 2 1048576 array.txt
+Execution time: 0.0179066s
+
+./ble 3 1048576 array.txt
+Execution time: 0.0145792s
+
+./ble 4 1048576 array.txt
+Execution time: 0.0111124s
+
+./ble 5 1048576 array.txt
+Execution time: 0.0133967s
+
+./ble 6 1048576 array.txt
+Execution time: 0.0141577s
+
+./ble 7 1048576 array.txt
+Execution time: 0.0133964s
+
+./ble 8 1048576 array.txt
+Execution time: 0.0125436s
+
+./ble 9 1048576 array.txt
+Execution time: 0.0147452s
+
+./ble 10 1048576 array.txt
+Execution time: 0.015179s
+

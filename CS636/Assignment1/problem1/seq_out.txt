@@ -1,0 +1,4 @@
+Number of elements: 1000000
+
+Execution time: 3164.62s
+Number of similar elements: 1410067567

@@ -1,0 +1,32 @@
+Number of elements: 1000000
+
+Number of Worker Threads: 1
+Execution time: 2674.34s
+Number of similar elements: 1410067567
+Number of Worker Threads: 2
+Execution time: 2664.66s
+Number of similar elements: 1410067567
+Number of Worker Threads: 3
+Execution time: 2568.47s
+Number of similar elements: 1410067567
+Number of Worker Threads: 4
+Execution time: 2560.08s
+Number of similar elements: 1410067567
+Number of Worker Threads: 5
+Execution time: 2532.69s
+Number of similar elements: 1410067567
+Number of Worker Threads: 6
+Execution time: 2530.31s
+Number of similar elements: 1410067567
+Number of Worker Threads: 7
+Execution time: 2547.68s
+Number of similar elements: 1410067567
+Number of Worker Threads: 8
+Execution time: 2544.71s
+Number of similar elements: 1410067567
+Number of Worker Threads: 9
+Execution time: 2522.95s
+Number of similar elements: 1410067567
+Number of Worker Threads: 10
+Execution time: 2527.04s
+Number of similar elements: 1410067567
